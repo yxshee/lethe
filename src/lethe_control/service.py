@@ -89,6 +89,7 @@ from lethe_control.models import (
 )
 from lethe_control.object_store import LocalObjectStore
 from lethe_control.policy import evaluate_contributors
+from lethe_control.qdrant_store import QdrantStore
 from lethe_control.vector_store import ChromaStore
 
 DEMO_AGENT_ID = "agent_demo_01"
@@ -144,7 +145,22 @@ class LetheService:
         self.settings.ensure_directories()
         self.state = StateStore(settings.database_path)
         self.objects = LocalObjectStore(settings.objects_dir)
-        self.vectors = ChromaStore(settings.chroma_dir)
+        self.vectors: ChromaStore | QdrantStore
+        if settings.vector_backend == "chroma":
+            self.vectors = ChromaStore(settings.chroma_dir)
+        elif settings.vector_backend == "qdrant":
+            self.vectors = QdrantStore(settings.qdrant_url)
+        else:
+            raise ValueError(f"unknown vector backend: {settings.vector_backend}")
+        vector_connector = f"connector://{settings.vector_backend}"
+        self.connectors: dict[ObjectKind, str] = {
+            **CONNECTORS,
+            ObjectKind.EMBEDDING: vector_connector,
+        }
+        self.registered_stores: list[str] = [
+            f"store://{settings.vector_backend}" if store == "store://chroma" else store
+            for store in REGISTERED_STORES
+        ]
         self.manifest = load_fixture_manifest()
         self.scope = ScopeKey(
             tenant_id=self.manifest["scope"]["tenant_id"],
@@ -407,7 +423,7 @@ class LetheService:
             local_content_fingerprint=self._fingerprint(kind, payload),
             provenance=Provenance(
                 activity_type=activity,
-                connector_ref=CONNECTORS[kind],
+                connector_ref=self.connectors[kind],
                 run_id="run_demo_seed",
             ),
             governance=GovernanceAnnotations(purpose_refs=[DEMO_PURPOSE]),
@@ -1204,7 +1220,7 @@ class LetheService:
                     finding_id=stable_id("finding", scan_id, envelope.version_id, "tracked"),
                     finding_class=FindingClass.TRACKED,
                     derivative_kind=envelope.kind,
-                    connector_ref=CONNECTORS[envelope.kind],
+                    connector_ref=self.connectors[envelope.kind],
                     target_version_id=envelope.version_id,
                     confidence=1.0,
                 )
@@ -1257,7 +1273,7 @@ class LetheService:
                         finding_id=stable_id("finding", scan_id, content_ref, "exact"),
                         finding_class=FindingClass.EXACT_UNTRACKED,
                         derivative_kind=exact_kind,
-                        connector_ref=CONNECTORS[ObjectKind.SOURCE],
+                        connector_ref=self.connectors[ObjectKind.SOURCE],
                         target_version_id=exact_target,
                         confidence=1.0,
                     )
@@ -1275,7 +1291,7 @@ class LetheService:
                         finding_id=stable_id("finding", scan_id, content_ref, "semantic"),
                         finding_class=FindingClass.SEMANTIC_CANDIDATE,
                         derivative_kind=ObjectKind.SOURCE,
-                        connector_ref=CONNECTORS[ObjectKind.SOURCE],
+                        connector_ref=self.connectors[ObjectKind.SOURCE],
                         target_version_id=opaque_ref,
                         confidence=confidence,
                     )
@@ -1384,7 +1400,7 @@ class LetheService:
                 supports_mutation=True,
                 supports_read_back=True,
             )
-            for connector in sorted(set(CONNECTORS.values()))
+            for connector in sorted(set(self.connectors.values()))
         ]
         manifest_id = stable_id("manifest", event.event_id, "L3")
         body = {
@@ -1395,13 +1411,13 @@ class LetheService:
             "selected_by": "authority://demo/data-owner",
             "requested_evidence_level": EvidenceLevel.L3.value,
             "scan_cutoff": _utc_text(now),
-            "registered_store_refs": REGISTERED_STORES,
-            "registered_connector_refs": sorted(set(CONNECTORS.values())),
+            "registered_store_refs": self.registered_stores,
+            "registered_connector_refs": sorted(set(self.connectors.values())),
             "connector_capability_versions": [
                 capability.model_dump(mode="json") for capability in capabilities
             ],
             "derivative_classes": [kind.value for kind in ObjectKind],
-            "freshness_cursors": {store: _utc_text(now) for store in REGISTERED_STORES},
+            "freshness_cursors": {store: _utc_text(now) for store in self.registered_stores},
             "denominators": {kind.value: count for kind, count in denominators.items()},
             "exclusions": [],
             "created_at": _utc_text(now),
@@ -1610,7 +1626,7 @@ class LetheService:
             {
                 "target_version_id": item.version_id,
                 "target_kind": item.kind.value,
-                "connector_ref": CONNECTORS[item.kind],
+                "connector_ref": self.connectors[item.kind],
                 "action_code": self._action_code(event.event_type, item.kind).value,
             }
             for item in sorted(targets, key=lambda value: value.version_id)
@@ -1620,7 +1636,7 @@ class LetheService:
                 {
                     "target_version_id": event.correction.replacement_version_id,
                     "target_kind": ObjectKind.SOURCE.value,
-                    "connector_ref": CONNECTORS[ObjectKind.SOURCE],
+                    "connector_ref": self.connectors[ObjectKind.SOURCE],
                     "action_code": ActionCode.REBUILD.value,
                 }
             )
@@ -3076,9 +3092,9 @@ class LetheService:
                 scope_selected_by=manifest_row["selected_by"],
                 requested_evidence_level=manifest_row["requested_evidence_level"],
                 scan_cutoff=manifest_row["scan_cutoff"],
-                registered_stores=len(REGISTERED_STORES),
-                registered_connectors=len(set(CONNECTORS.values())),
-                reachable_connectors=len(set(CONNECTORS.values())),
+                registered_stores=len(self.registered_stores),
+                registered_connectors=len(set(self.connectors.values())),
+                reachable_connectors=len(set(self.connectors.values())),
                 connector_capability_versions=capabilities,
                 unsupported_connectors=[],
                 graph_snapshot_hash=run["graph_snapshot_hash"],

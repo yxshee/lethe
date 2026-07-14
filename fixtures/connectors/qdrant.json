@@ -1,0 +1,13 @@
+{
+  "connector_ref": "connector://qdrant",
+  "store_ref": "store://qdrant",
+  "capability_version": "1",
+  "kinds": ["embedding"],
+  "supports_inventory": true,
+  "supports_mutation": true,
+  "supports_read_back": true,
+  "physical_id_scheme": "sha256(LETHE-QDRANT-ID-V1, length-prefixed scope + version) truncated to UUID",
+  "filters": ["scope", "lifecycle_state", "valid_until_epoch", "policy_binding"],
+  "distance": "cosine_similarity converted to cosine_distance at the adapter boundary",
+  "deployment": "external server, LETHE_QDRANT_URL"
+}

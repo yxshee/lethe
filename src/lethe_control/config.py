@@ -11,6 +11,8 @@ class Settings:
     host: str = "127.0.0.1"
     port: int = 8000
     demo_profile: bool = True
+    vector_backend: str = "chroma"
+    qdrant_url: str = "http://127.0.0.1:6333"
     control_token: str = "lethe-control-demo"
     alice_token: str = "lethe-alice-demo"
     bob_token: str = "lethe-bob-demo"
@@ -23,6 +25,8 @@ class Settings:
             host=os.getenv("LETHE_HOST", "127.0.0.1"),
             port=int(os.getenv("LETHE_PORT", "8000")),
             demo_profile=os.getenv("LETHE_DEMO_PROFILE", "1") == "1",
+            vector_backend=os.getenv("LETHE_VECTOR_BACKEND", "chroma"),
+            qdrant_url=os.getenv("LETHE_QDRANT_URL", "http://127.0.0.1:6333"),
             control_token=os.getenv("LETHE_CONTROL_TOKEN", "lethe-control-demo"),
             alice_token=os.getenv("LETHE_ALICE_TOKEN", "lethe-alice-demo"),
             bob_token=os.getenv("LETHE_BOB_TOKEN", "lethe-bob-demo"),

@@ -66,6 +66,15 @@ Separate deterministic lifecycle demos are available as:
 ./scripts/demo-permission-change.sh
 ```
 
+## Vector backends
+
+Chroma (embedded) is the default. A Qdrant sink is selectable with
+`LETHE_VECTOR_BACKEND=qdrant` and `LETHE_QDRANT_URL` (default
+`http://127.0.0.1:6333`); evidence then names `connector://qdrant`.
+Backend parity is enforced by `tests/test_vector_conformance.py` against the
+capability manifests in `fixtures/connectors/`; the Qdrant leg runs whenever a
+server is reachable and is skipped otherwise.
+
 ## Fixture authentication
 
 The dashboard keeps fixture tokens in memory only:
