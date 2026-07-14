@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Lineage ring with two erased nodes and a revocation slash">
+  <style>
+    :root {
+      --paper: #eae3d4;
+      --ink: #292420;
+      --mark: #bf4128;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #211d18;
+        --ink: #e7dfd1;
+        --mark: #d9553a;
+      }
+    }
+    .paper { fill: var(--paper); }
+    .ink-fill { fill: var(--ink); }
+    .ink-line { stroke: var(--ink); fill: none; }
+    .erased { fill: var(--paper); stroke: var(--ink); }
+    .casing { stroke: var(--paper); fill: none; }
+    .mark { stroke: var(--mark); fill: none; }
+  </style>
+
+  <rect class="paper" x="0" y="0" width="64" height="64" rx="13"/>
+
+  <!-- lineage ring -->
+  <circle class="ink-line" cx="32" cy="32" r="17" stroke-width="1.8"/>
+
+  <!-- living nodes -->
+  <circle class="ink-fill" cx="49" cy="32" r="3.6"/>
+  <circle class="ink-fill" cx="32" cy="15" r="3.6"/>
+  <circle class="ink-fill" cx="20" cy="20" r="3.6"/>
+  <circle class="ink-fill" cx="15" cy="32" r="3.6"/>
+  <circle class="ink-fill" cx="32" cy="49" r="3.6"/>
+  <circle class="ink-fill" cx="44" cy="44" r="3.6"/>
+
+  <!-- revocation slash: paper casing cuts the ring first -->
+  <line class="casing" x1="14.5" y1="49.5" x2="49.5" y2="14.5" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- erased nodes: hollowed, skewered by the mark -->
+  <circle class="erased" cx="44" cy="20" r="3.9" stroke-width="1.8"/>
+  <circle class="erased" cx="20" cy="44" r="3.9" stroke-width="1.8"/>
+
+  <line class="mark" x1="15.5" y1="48.5" x2="48.5" y2="15.5" stroke-width="4.2" stroke-linecap="round"/>
+</svg>
