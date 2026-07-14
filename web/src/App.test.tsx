@@ -2,7 +2,7 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
-import type { DemoEventFixture, ExecutionReceipt, LifecycleEvent } from "./api/types";
+import type { DemoEventFixture, ExecutionReceipt, LifecycleEvent, PostureAssessmentReport } from "./api/types";
 
 const deleteEvent: LifecycleEvent = {
   schema_version: "1",
@@ -82,6 +82,37 @@ const receipt: ExecutionReceipt = {
   signature: "receipt-signature-value",
 };
 
+const postureReport: PostureAssessmentReport = {
+  tenant_id: "ten_demo",
+  workspace_id: "ws_demo",
+  environment_id: "env_local",
+  schema_version: "1",
+  assessment_id: "assess_01",
+  scan_id: "scan_01",
+  read_only: true,
+  coverage_level: "L2",
+  scope_manifest_hash: "manifest-hash-value",
+  denominators: { chunk: 0 },
+  connector_freshness: [
+    {
+      connector_ref: "connector://sqlite/cache",
+      store_ref: null,
+      capability_version: "1",
+      freshness_cursor: "cursor-01",
+      reachable: true,
+      kinds: ["cache"],
+    },
+  ],
+  findings: [],
+  lineage_gaps: [],
+  unsupported_scope: [],
+  incidents: [],
+  severity_counts: { critical: 0, high: 0, medium: 0, informational: 0 },
+  outcome: "succeeded",
+  started_at: "2026-07-14T10:00:00Z",
+  completed_at: "2026-07-14T10:00:03Z",
+};
+
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
     status,
@@ -148,6 +179,7 @@ function installApiMock() {
         }],
       });
     }
+    if (path === "/api/v1/assessments") return json(postureReport);
     if (path === "/api/v1/receipts/run_01") return json(receipt);
     if (path === "/api/v1/receipts/verify") return json({ valid: true, signature_valid: true, chain_valid: true });
     return json({ detail: "not found" }, 404);
@@ -233,5 +265,17 @@ describe("Lethe dashboard", () => {
     await waitFor(() => {
       expect(fetchMock.mock.calls.some(([input]) => pathOf(input as RequestInfo | URL) === "/api/v1/runs/run_01")).toBe(true);
     });
+  });
+
+  it("runs a posture assessment and shows read-only evidence framing", async () => {
+    const user = userEvent.setup();
+    installApiMock();
+    render(<App />);
+
+    await user.click(screen.getByRole("button", { name: "Run posture assessment" }));
+
+    expect(await screen.findByText("observed — not enforced")).toBeInTheDocument();
+    const outcomeBadge = await screen.findByText("succeeded");
+    expect(outcomeBadge).toHaveClass("badge--outcome-succeeded");
   });
 });

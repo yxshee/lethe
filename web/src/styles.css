@@ -358,7 +358,8 @@ main {
 .section-intro h2,
 .dispatch-context h2,
 .lineage-heading h2,
-.receipt-title-block h2 {
+.receipt-title-block h2,
+.posture-title-block h2 {
   margin: 1.1rem 0 1.6rem;
   font-family: var(--display);
   font-size: clamp(2.4rem, 4.3vw, 5rem);
@@ -369,7 +370,8 @@ main {
 
 .section-intro > p,
 .dispatch-context > p,
-.receipt-title-block > p {
+.receipt-title-block > p,
+.posture-title-block > p {
   max-width: 520px;
   margin: 0;
   color: var(--ink-soft);
@@ -1329,6 +1331,140 @@ th {
   color: var(--signal-deep);
 }
 
+.posture-section {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.65fr) minmax(0, 1.35fr);
+  border-bottom: 1px solid var(--ink);
+  background: var(--paper-high);
+}
+
+.posture-title-block {
+  padding: clamp(2rem, 5vw, 5rem);
+  border-right: 1px solid var(--ink);
+}
+
+.posture-title-block .button {
+  margin-top: 1.6rem;
+}
+
+.posture-content {
+  padding: clamp(2rem, 5vw, 5rem);
+}
+
+.posture-report-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.posture-report h3 {
+  margin: 0.85rem 0 1.3rem;
+  font-family: var(--display);
+  font-size: clamp(1.8rem, 3vw, 2.75rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+}
+
+.posture-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.posture-framing {
+  color: var(--signal-deep);
+}
+
+.badge {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid currentColor;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.badge--outcome-succeeded {
+  color: var(--safe);
+}
+
+.badge--outcome-partial {
+  color: var(--mustard);
+}
+
+.badge--outcome-failed,
+.badge--outcome-unknown {
+  color: var(--signal-deep);
+}
+
+.badge--coverage {
+  color: var(--blueprint);
+}
+
+.badge--fixture {
+  color: var(--mustard);
+}
+
+.posture-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1rem 0 1.6rem;
+}
+
+.severity-text {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.severity-text--critical {
+  color: var(--signal-deep);
+}
+
+.severity-text--high {
+  color: var(--signal);
+}
+
+.severity-text--medium {
+  color: var(--mustard);
+}
+
+.severity-text--informational {
+  color: var(--ink-soft);
+}
+
+.posture-denominators {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--ink);
+  border-left: 1px solid var(--ink);
+}
+
+.posture-denominators div {
+  min-width: 0;
+  padding: 0.85rem 1rem;
+  border-right: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+
+.posture-denominators dt {
+  font-family: var(--mono);
+  font-size: 0.57rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.posture-denominators dd {
+  margin: 0.5rem 0 0;
+  font-family: var(--display);
+  font-size: 1.4rem;
+}
+
 footer {
   display: grid;
   grid-template-columns: 0.55fr 1fr 0.45fr;
@@ -1392,13 +1528,15 @@ footer span:last-child {
 
   .query-section,
   .dispatch-section,
-  .receipt-section {
+  .receipt-section,
+  .posture-section {
     grid-template-columns: 1fr;
   }
 
   .section-intro,
   .dispatch-context,
-  .receipt-title-block {
+  .receipt-title-block,
+  .posture-title-block {
     border-right: 0;
     border-bottom: 1px solid var(--ink);
   }

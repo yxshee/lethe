@@ -8,6 +8,7 @@ import {
   type GraphResponse,
   type HealthResponse,
   type LifecycleEvent,
+  type PostureAssessmentReport,
   type QueryRequest,
   type QueryResponse,
   type ReceiptVerifyRequest,
@@ -114,6 +115,13 @@ export const api = {
 
   scan: (targetVersionId: string) =>
     requestJson<ScanResponse>("/api/v1/scans", {
+      method: "POST",
+      headers: bearer(FIXTURE_TOKENS.operator),
+      body: JSON.stringify({ ...DEMO_SCOPE, root_version_ids: [targetVersionId] }),
+    }),
+
+  assess: (targetVersionId: string) =>
+    requestJson<PostureAssessmentReport>("/api/v1/assessments", {
       method: "POST",
       headers: bearer(FIXTURE_TOKENS.operator),
       body: JSON.stringify({ ...DEMO_SCOPE, root_version_ids: [targetVersionId] }),

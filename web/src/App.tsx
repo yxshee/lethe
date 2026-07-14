@@ -9,17 +9,19 @@ import {
   type EventType,
   type ExecutionReceipt,
   type GraphResponse,
+  type PostureAssessmentReport,
   type QueryResponse,
   type ReceiptVerifyResponse,
   type RunStatus,
   type ScanResponse,
 } from "./api/types";
 import { LineageMap } from "./components/LineageMap";
+import { PostureReport } from "./components/PostureReport";
 import { ReceiptPanel } from "./components/ReceiptPanel";
 import { RunInspector } from "./components/RunInspector";
 import "./styles.css";
 
-type BusyAction = "unsafe" | "query" | "event" | "scan" | "graph" | "verify" | null;
+type BusyAction = "unsafe" | "query" | "event" | "scan" | "graph" | "verify" | "assess" | null;
 type ApiState = "checking" | "online" | "offline";
 
 interface TrustedCheckpointInput {
@@ -119,6 +121,7 @@ export default function App() {
   const [runId, setRunId] = useState<string | null>(null);
   const [run, setRun] = useState<RunStatus | null>(null);
   const [scan, setScan] = useState<ScanResponse | null>(null);
+  const [assessment, setAssessment] = useState<PostureAssessmentReport | null>(null);
   const [graph, setGraph] = useState<GraphResponse | null>(null);
   const [receipt, setReceipt] = useState<ExecutionReceipt | null>(null);
   const [verification, setVerification] = useState<ReceiptVerifyResponse | null>(null);
@@ -248,6 +251,11 @@ export default function App() {
   async function handleScan() {
     const result = await runAction("scan", () => api.scan(targetVersionId));
     if (result) setScan(result);
+  }
+
+  async function handleAssess() {
+    const result = await runAction("assess", () => api.assess(targetVersionId));
+    if (result) setAssessment(result);
   }
 
   async function handleVerify() {
@@ -435,6 +443,20 @@ export default function App() {
               <small>tracked · exact untracked · semantic candidate</small>
             </button>
             <RunInspector run={run} scan={scan} />
+          </div>
+        </section>
+
+        <section className="posture-section" aria-labelledby="posture-heading">
+          <div className="posture-title-block">
+            <span className="section-number">05+ / Posture</span>
+            <h2 id="posture-heading">Read-only posture assessment</h2>
+            <p>Inventory current gaps against declared scope without mutating anything. Evidence only—no denial, no repair.</p>
+            <button className="button button--ink" type="button" onClick={handleAssess} disabled={busy !== null}>
+              {busy === "assess" ? "Assessing…" : "Run posture assessment"}
+            </button>
+          </div>
+          <div className="posture-content">
+            <PostureReport report={assessment} />
           </div>
         </section>
 
