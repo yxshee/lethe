@@ -1,0 +1,10 @@
+{
+  "connector_ref": "connector://gdrive",
+  "role": "source",
+  "capability_version": "1",
+  "event_types": ["delete", "correct", "expire", "permission_change"],
+  "supports_incremental_cursor": true,
+  "supports_permission_events": true,
+  "external_ref_scheme": "stable_id(gdrivesrc, file_id) — opaque, never URLs",
+  "deployment": "external SaaS; live conformance requires LETHE_GDRIVE_CLIENT_ID/SECRET + user OAuth consent"
+}

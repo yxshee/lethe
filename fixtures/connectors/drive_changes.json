@@ -1,0 +1,75 @@
+{
+  "pages": {
+    "genesis": {
+      "changes": [
+        {
+          "file_id": "file-removed-1",
+          "removed": true,
+          "trashed": false,
+          "permissions_changed": false,
+          "edited": false,
+          "sequence": 1,
+          "time": "2026-01-01T00:00:01Z"
+        },
+        {
+          "file_id": "file-trashed-1",
+          "removed": false,
+          "trashed": true,
+          "permissions_changed": false,
+          "edited": false,
+          "sequence": 2,
+          "time": "2026-01-01T00:00:02Z"
+        },
+        {
+          "file_id": "file-perm-1",
+          "removed": false,
+          "trashed": false,
+          "permissions_changed": true,
+          "edited": false,
+          "sequence": 3,
+          "time": "2026-01-01T00:00:03Z"
+        },
+        {
+          "file_id": "file-edited-1",
+          "removed": false,
+          "trashed": false,
+          "permissions_changed": false,
+          "edited": true,
+          "sequence": 4,
+          "time": "2026-01-01T00:00:04Z"
+        }
+      ],
+      "next_page_token": "token-2",
+      "token_expired": false
+    },
+    "token-2": {
+      "changes": [
+        {
+          "file_id": "file-edited-2",
+          "removed": false,
+          "trashed": false,
+          "permissions_changed": false,
+          "edited": true,
+          "sequence": 5,
+          "time": "2026-01-01T00:00:05Z"
+        },
+        {
+          "file_id": "file-noop-1",
+          "removed": false,
+          "trashed": false,
+          "permissions_changed": false,
+          "edited": false,
+          "sequence": 6,
+          "time": "2026-01-01T00:00:06Z"
+        }
+      ],
+      "next_page_token": null,
+      "token_expired": false
+    },
+    "expired-token": {
+      "changes": [],
+      "next_page_token": null,
+      "token_expired": true
+    }
+  }
+}
