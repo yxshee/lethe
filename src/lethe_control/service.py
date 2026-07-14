@@ -65,6 +65,7 @@ from lethe_control.models import (
     ObjectKind,
     PermissionChangeKind,
     PolicyAction,
+    PostureAssessmentReport,
     Provenance,
     QueryRequest,
     QueryResponse,
@@ -1327,6 +1328,11 @@ class LetheService:
             completed_at=now,
         )
 
+    def assess(self, request: ScanRequest) -> PostureAssessmentReport:
+        from lethe_control.assessment import run_posture_assessment
+
+        return run_posture_assessment(self, request)
+
     def _event_from_row(self, row: sqlite3.Row) -> LifecycleEvent:
         return LifecycleEvent.model_validate(
             {
@@ -1389,6 +1395,23 @@ class LetheService:
     def _build_manifest(
         self, event: LifecycleEvent, targets: list[KnowledgeEnvelope], now: datetime
     ) -> ScopeManifest:
+        return self._manifest_for_targets(
+            seed=event.event_id,
+            scope=event.scope,
+            targets=targets,
+            now=now,
+            requested_evidence_level=EvidenceLevel.L3,
+        )
+
+    def _manifest_for_targets(
+        self,
+        *,
+        seed: str,
+        scope: ScopeKey,
+        targets: list[KnowledgeEnvelope],
+        now: datetime,
+        requested_evidence_level: EvidenceLevel,
+    ) -> ScopeManifest:
         denominators = {kind: 0 for kind in ObjectKind}
         for target in targets:
             denominators[target.kind] += 1
@@ -1402,14 +1425,14 @@ class LetheService:
             )
             for connector in sorted(set(self.connectors.values()))
         ]
-        manifest_id = stable_id("manifest", event.event_id, "L3")
+        manifest_id = stable_id("manifest", seed, requested_evidence_level.value)
         body = {
             "schema_version": "1",
-            **event.scope.model_dump(),
+            **scope.model_dump(),
             "manifest_id": manifest_id,
             "manifest_hash": "pending00",
             "selected_by": "authority://demo/data-owner",
-            "requested_evidence_level": EvidenceLevel.L3.value,
+            "requested_evidence_level": requested_evidence_level.value,
             "scan_cutoff": _utc_text(now),
             "registered_store_refs": self.registered_stores,
             "registered_connector_refs": sorted(set(self.connectors.values())),

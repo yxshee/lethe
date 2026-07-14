@@ -582,6 +582,112 @@ class ScanResponse(ScopedContract):
     completed_at: UtcDateTime
 
 
+class AssessmentSeverity(StrEnum):
+    CRITICAL = "critical"
+    HIGH = "high"
+    MEDIUM = "medium"
+    INFORMATIONAL = "informational"
+
+
+class AssessmentGapCode(StrEnum):
+    MISSING_PARENT_EDGE = "missing_parent_edge"
+    MISSING_POLICY_METADATA = "missing_policy_metadata"
+    MISSING_LINEAGE_METADATA = "missing_lineage_metadata"
+    UNSUPPORTED_CONNECTOR = "unsupported_connector"
+    UNVERIFIED_SEMANTIC_CANDIDATE = "unverified_semantic_candidate"
+
+
+class AssessmentFinding(ContractModel):
+    finding_id: OpaqueId
+    severity: AssessmentSeverity
+    finding_class: FindingClass
+    derivative_kind: ObjectKind
+    connector_ref: OpaqueRef
+    target_version_id: OpaqueId | None = None
+    evidence_level: EvidenceLevel
+    gap_code: AssessmentGapCode | None = None
+    confidence: Annotated[float, Field(ge=0, le=1)] | None = None
+    reason_code: ReceiptReasonCode | None = None
+
+    @model_validator(mode="after")
+    def validate_read_only_evidence(self) -> AssessmentFinding:
+        if self.evidence_level not in {EvidenceLevel.L1, EvidenceLevel.L2}:
+            raise ValueError("read-only assessment findings are limited to L1 or L2 evidence")
+        return self
+
+
+class ConnectorFreshness(ContractModel):
+    connector_ref: OpaqueRef
+    store_ref: OpaqueRef | None = None
+    capability_version: OpaqueId
+    freshness_cursor: OpaqueId
+    reachable: bool
+    kinds: list[ObjectKind] = Field(default_factory=list)
+
+
+class ScannerFixtureMetrics(ContractModel):
+    corpus_ref: OpaqueRef
+    precision: Annotated[float, Field(ge=0, le=1)]
+    recall: Annotated[float, Field(ge=0, le=1)]
+    fixture_only: Literal[True] = True
+
+
+class AssessmentIncident(ContractModel):
+    incident_id: OpaqueId
+    severity: AssessmentSeverity
+    finding_ids: list[OpaqueId]
+    reason_code: ReceiptReasonCode
+    detected_at: UtcDateTime
+
+    @model_validator(mode="after")
+    def validate_incident(self) -> AssessmentIncident:
+        if not self.finding_ids:
+            raise ValueError("incident requires at least one finding")
+        return self
+
+
+class PostureAssessmentReport(ScopedContract):
+    schema_version: Literal["1"] = "1"
+    assessment_id: OpaqueId
+    scan_id: OpaqueId
+    read_only: Literal[True] = True
+    coverage_level: EvidenceLevel
+    scope_manifest_hash: Digest
+    denominators: dict[ObjectKind, Annotated[int, Field(ge=0)]]
+    connector_freshness: list[ConnectorFreshness]
+    findings: list[AssessmentFinding]
+    lineage_gaps: list[AssessmentFinding]
+    unsupported_scope: list[UnsupportedSink] = Field(default_factory=list)
+    incidents: list[AssessmentIncident]
+    severity_counts: dict[AssessmentSeverity, Annotated[int, Field(ge=0)]]
+    fixture_metrics: ScannerFixtureMetrics | None = None
+    outcome: RunOutcome
+    started_at: UtcDateTime
+    completed_at: UtcDateTime
+
+    @model_validator(mode="after")
+    def validate_report(self) -> PostureAssessmentReport:
+        if self.coverage_level not in {EvidenceLevel.L1, EvidenceLevel.L2}:
+            raise ValueError("read-only assessment coverage is limited to L1 or L2")
+        if self.completed_at < self.started_at:
+            raise ValueError("completed_at cannot precede started_at")
+        expected_gaps = [finding for finding in self.findings if finding.gap_code is not None]
+        if self.lineage_gaps != expected_gaps:
+            raise ValueError("lineage_gaps must be exactly the gap-coded findings")
+        tally: dict[AssessmentSeverity, int] = {}
+        for finding in self.findings:
+            tally[finding.severity] = tally.get(finding.severity, 0) + 1
+        if {key: value for key, value in self.severity_counts.items() if value} != tally:
+            raise ValueError("severity_counts must match the finding tally")
+        known_findings = {finding.finding_id for finding in self.findings}
+        for incident in self.incidents:
+            if not set(incident.finding_ids) <= known_findings:
+                raise ValueError("incident references unknown findings")
+        if self.outcome is RunOutcome.SUCCEEDED and sum(self.denominators.values()) == 0:
+            raise ValueError("succeeded assessment requires a nonzero declared denominator")
+        return self
+
+
 class ReceiptVerifyRequest(ContractModel):
     receipts: list[ExecutionReceipt]
     expected_sequence: Annotated[int, Field(ge=1)]
