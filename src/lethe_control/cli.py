@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import statistics
 import sys
 import time
@@ -229,6 +230,34 @@ def run_assessment_stage(settings: Settings, root_version_id: str, output: Path 
         output.write_text(rendered + "\n", encoding="utf-8")
     print(rendered)
     return 0 if report.outcome.value != "failed" else 1
+
+
+def run_control_serve(settings: Settings, host: str, port: int) -> int:
+    from lethe_control.control_plane.app import create_control_app
+    from lethe_control.control_plane.store import ControlPlaneStore, seed_demo_enrollments
+
+    store = ControlPlaneStore(settings.state_dir / "control_plane.db")
+    seed_demo_enrollments(store)
+    uvicorn.run(create_control_app(store), host=host, port=port)
+    return 0
+
+
+def run_sync_stage(settings: Settings, control_url: str, cursor: int) -> int:
+    from lethe_control.control_plane.store import DEMO_AGENT_TOKEN
+    from lethe_control.control_plane.sync import ControlPlaneClient, HttpxControlTransport
+
+    service = _deterministic_service(settings)
+    service.initialize()
+    agent_token = os.getenv("LETHE_CP_AGENT_TOKEN", DEMO_AGENT_TOKEN)
+    client = ControlPlaneClient(HttpxControlTransport(control_url), agent_token=agent_token)
+    summary = client.pull_and_apply(service, cursor=cursor)
+    if summary["applied_run_ids"]:
+        service.drain_actions(force=True)
+        for run_id in summary["applied_run_ids"]:
+            client.push_receipt(service, run_id)
+            client.push_status(service, run_id)
+    print(json.dumps(summary, indent=2))
+    return 0
 
 
 def run_propagation_stage(settings: Settings, run_id: str | None) -> int:
@@ -464,6 +493,12 @@ def parser() -> argparse.ArgumentParser:
     serve = subcommands.add_parser("serve")
     serve.add_argument("--host", default="127.0.0.1", choices=["127.0.0.1", "localhost"])
     serve.add_argument("--port", type=int, default=8000)
+    control_serve = subcommands.add_parser("control-serve")
+    control_serve.add_argument("--host", default="127.0.0.1", choices=["127.0.0.1", "localhost"])
+    control_serve.add_argument("--port", type=int, default=8100)
+    sync = subcommands.add_parser("sync")
+    sync.add_argument("--control-url", default="http://127.0.0.1:8100")
+    sync.add_argument("--cursor", type=int, default=0)
     openapi = subcommands.add_parser("openapi")
     openapi.add_argument("--output", type=Path, required=True)
     verify = subcommands.add_parser("verify-receipt")
@@ -511,6 +546,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "serve":
         uvicorn.run(create_app(settings=settings), host=args.host, port=args.port)
         return 0
+    if args.command == "control-serve":
+        return run_control_serve(settings, args.host, args.port)
+    if args.command == "sync":
+        return run_sync_stage(settings, args.control_url, args.cursor)
     if args.command == "openapi":
         return write_openapi(settings, args.output)
     if args.command == "verify-receipt":
