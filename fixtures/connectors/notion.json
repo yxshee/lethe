@@ -1,0 +1,10 @@
+{
+  "connector_ref": "connector://notion",
+  "role": "source",
+  "capability_version": "1",
+  "event_types": ["delete", "correct", "expire", "permission_change"],
+  "supports_incremental_cursor": true,
+  "supports_permission_events": true,
+  "external_ref_scheme": "stable_id(notionsrc, page_id) — opaque, never URLs",
+  "deployment": "external SaaS; live conformance requires LETHE_NOTION_TOKEN"
+}

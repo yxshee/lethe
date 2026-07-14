@@ -1,0 +1,57 @@
+{
+  "pages": {
+    "genesis": {
+      "results": [
+        {
+          "page_id": "page-001",
+          "change": "trashed",
+          "sequence": 1,
+          "observed_at": "2026-01-01T00:00:00Z"
+        },
+        {
+          "page_id": "page-002",
+          "change": "edited",
+          "sequence": 2,
+          "observed_at": "2026-01-01T00:05:00Z"
+        },
+        {
+          "page_id": "page-003",
+          "change": "expired",
+          "sequence": 3,
+          "observed_at": "2026-01-01T00:10:00Z"
+        },
+        {
+          "page_id": "page-004",
+          "change": "share_updated",
+          "sequence": 4,
+          "observed_at": "2026-01-01T00:15:00Z"
+        }
+      ],
+      "next_cursor": "cursor-2",
+      "cursor_expired": false
+    },
+    "cursor-2": {
+      "results": [
+        {
+          "page_id": "page-005",
+          "change": "trashed",
+          "sequence": 5,
+          "observed_at": "2026-01-01T00:20:00Z"
+        },
+        {
+          "page_id": "page-006",
+          "change": "commented",
+          "sequence": 6,
+          "observed_at": "2026-01-01T00:25:00Z"
+        }
+      ],
+      "next_cursor": null,
+      "cursor_expired": false
+    },
+    "expired-cursor": {
+      "results": [],
+      "next_cursor": null,
+      "cursor_expired": true
+    }
+  }
+}
