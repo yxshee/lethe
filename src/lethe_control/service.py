@@ -11,6 +11,8 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from lethe_control.adapters import AdapterAction
+from lethe_control.app_local_adapter import SqliteAppLocalAdapter
 from lethe_control.clock import Clock, SystemClock
 from lethe_control.config import Settings
 from lethe_control.crypto import (
@@ -146,6 +148,7 @@ class LetheService:
         self.settings.ensure_directories()
         self.state = StateStore(settings.database_path)
         self.objects = LocalObjectStore(settings.objects_dir)
+        self.app_local = SqliteAppLocalAdapter(self.state)
         self.vectors: ChromaStore | QdrantStore
         if settings.vector_backend == "chroma":
             self.vectors = ChromaStore(settings.chroma_dir)
@@ -1190,20 +1193,13 @@ class LetheService:
             str(metadata.get("version_id", physical_id))
             for physical_id, metadata in self.vectors.inventory(**self.scope.model_dump())
         }
-        sql_versions: dict[ObjectKind, set[str]] = {}
-        for kind, table in (
-            (ObjectKind.CACHE, "cache_entries"),
-            (ObjectKind.SUMMARY, "summaries"),
-            (ObjectKind.MEMORY, "memories"),
-        ):
-            rows = self.state.fetch_all(
-                f"""
-                SELECT DISTINCT version_id FROM {table}
-                WHERE tenant_id=? AND workspace_id=? AND environment_id=?
-                """,
-                self._scope_values(self.scope),
-            )
-            sql_versions[kind] = {str(row["version_id"]) for row in rows}
+        sql_versions: dict[ObjectKind, set[str]] = {
+            ObjectKind.CACHE: set(),
+            ObjectKind.SUMMARY: set(),
+            ObjectKind.MEMORY: set(),
+        }
+        for record in self.app_local.inventory(self.scope):
+            sql_versions[record.kind].add(record.opaque_target_ref)
 
         def physically_present(envelope: KnowledgeEnvelope) -> bool:
             if envelope.kind in {ObjectKind.SOURCE, ObjectKind.CHUNK}:
@@ -2349,54 +2345,25 @@ class LetheService:
                 if policy_row is None:
                     raise RuntimeError("permission_policy_missing")
                 allowed = list(json.loads(policy_row["allowed_principal_refs_json"]))
-                placeholders = ",".join("?" for _ in allowed)
-                with self.state.transaction() as connection:
-                    connection.execute(
-                        f"""
-                        DELETE FROM cache_entries
-                        WHERE tenant_id=? AND workspace_id=? AND environment_id=?
-                          AND version_id=?
-                          AND principal_ref NOT IN ({placeholders})
-                        """,
-                        (*self._scope_values(self.scope), version_id, *allowed),
-                    )
-                    connection.execute(
-                        """
-                        UPDATE cache_entries SET policy_version=?
-                        WHERE tenant_id=? AND workspace_id=? AND environment_id=?
-                          AND version_id=?
-                        """,
-                        (
-                            change.new_policy_version,
-                            *self._scope_values(self.scope),
-                            version_id,
-                        ),
-                    )
-                remaining_removed = self.state.fetch_one(
-                    f"""
-                    SELECT 1 FROM cache_entries
-                    WHERE tenant_id=? AND workspace_id=? AND environment_id=?
-                      AND version_id=? AND principal_ref NOT IN ({placeholders})
-                    LIMIT 1
-                    """,
-                    (*self._scope_values(self.scope), version_id, *allowed),
-                )
-                stale_policy = self.state.fetch_one(
-                    """
-                    SELECT 1 FROM cache_entries
-                    WHERE tenant_id=? AND workspace_id=? AND environment_id=?
-                      AND version_id=? AND policy_version<>? LIMIT 1
-                    """,
-                    (
-                        *self._scope_values(self.scope),
-                        version_id,
-                        change.new_policy_version,
+                evict_result = self.app_local.apply_action(
+                    self.scope,
+                    AdapterAction(
+                        action_id=str(row["action_id"]),
+                        action_code=ActionCode.EVICT,
+                        target_version_id=version_id,
+                        kind=kind,
+                        content_ref=None,
+                        metadata={
+                            "mode": "principal_evict",
+                            "allowed_principal_refs": allowed,
+                            "new_policy_version": change.new_policy_version,
+                        },
                     ),
                 )
-                if remaining_removed is not None or stale_policy is not None:
+                if not evict_result.verified:
                     raise RuntimeError("read_back_failed")
                 return {
-                    "result": "removed_principal_cache_evicted",
+                    "result": evict_result.result_code,
                     "verified": True,
                     "policy_version": change.new_policy_version,
                 }
@@ -2439,32 +2406,18 @@ class LetheService:
                 self.vectors.delete(**self.scope.model_dump(), version_id=version_id)
                 absent = not self.vectors.exists(**self.scope.model_dump(), version_id=version_id)
             else:
-                table = {
-                    ObjectKind.CACHE: "cache_entries",
-                    ObjectKind.SUMMARY: "summaries",
-                    ObjectKind.MEMORY: "memories",
-                }[kind]
-                with self.state.transaction() as connection:
-                    connection.execute(
-                        f"""
-                        DELETE FROM {table}
-                        WHERE tenant_id=? AND workspace_id=? AND environment_id=? AND version_id=?
-                        """,
-                        (*self._scope_values(self.scope), version_id),
-                    )
-                    self.state.set_lifecycle_state(
-                        connection, self.scope, version_id, LifecycleState.TOMBSTONED
-                    )
-                    remaining = connection.execute(
-                        f"""
-                        SELECT 1 FROM {table}
-                        WHERE tenant_id=? AND workspace_id=? AND environment_id=?
-                          AND version_id=? LIMIT 1
-                        """,
-                        (*self._scope_values(self.scope), version_id),
-                    ).fetchone()
-                absent = remaining is None
-                lifecycle_updated = True
+                delete_result = self.app_local.apply_action(
+                    self.scope,
+                    AdapterAction(
+                        action_id=str(row["action_id"]),
+                        action_code=action,
+                        target_version_id=version_id,
+                        kind=kind,
+                        content_ref=None,
+                        metadata={},
+                    ),
+                )
+                absent = delete_result.verified
             if not lifecycle_updated:
                 with self.state.transaction() as connection:
                     self.state.set_lifecycle_state(
