@@ -16,19 +16,26 @@ from pathlib import Path
 
 import pytest
 
+from lethe_control.pinecone_store import PineconeStore
 from lethe_control.qdrant_store import QdrantStore
 from lethe_control.vector_store import ChromaStore
 
 QDRANT_URL = os.getenv("LETHE_QDRANT_URL", "http://127.0.0.1:6333")
 MANIFEST_DIR = Path(__file__).resolve().parent.parent / "fixtures" / "connectors"
 
-VectorBackend = ChromaStore | QdrantStore
+VectorBackend = ChromaStore | QdrantStore | PineconeStore
 
 
-@pytest.fixture(params=["chroma", "qdrant"])
+@pytest.fixture(params=["chroma", "qdrant", "pinecone"])
 def backend(request: pytest.FixtureRequest, tmp_path: Path) -> tuple[str, VectorBackend]:
     if request.param == "chroma":
         return "chroma", ChromaStore(tmp_path / "chroma")
+    if request.param == "pinecone":
+        try:
+            pinecone_store = PineconeStore()
+        except Exception as exc:
+            pytest.skip(f"pinecone unreachable/unconfigured: {exc}")
+        return "pinecone", pinecone_store
     try:
         store = QdrantStore(QDRANT_URL)
     except Exception:

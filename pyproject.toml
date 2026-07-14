@@ -12,6 +12,7 @@ dependencies = [
   "chromadb>=1.2,<2",
   "cryptography>=45,<48",
   "fastapi>=0.116,<1",
+  "pinecone>=9.1.0",
   "pydantic>=2.11,<3",
   "qdrant-client>=1.18.0",
   "rfc8785>=0.1.4,<1",

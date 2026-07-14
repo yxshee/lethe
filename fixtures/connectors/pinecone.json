@@ -1,0 +1,13 @@
+{
+  "connector_ref": "connector://pinecone",
+  "store_ref": "store://pinecone",
+  "capability_version": "1",
+  "kinds": ["embedding"],
+  "supports_inventory": true,
+  "supports_mutation": true,
+  "supports_read_back": true,
+  "physical_id_scheme": "sha256(LETHE-PINECONE-ID-V1, length-prefixed scope + version) as vec-<hex>",
+  "filters": ["scope", "lifecycle_state", "valid_until_epoch", "policy_binding"],
+  "distance": "cosine_similarity converted to cosine_distance at the adapter boundary",
+  "deployment": "external SaaS; live conformance requires LETHE_PINECONE_API_KEY"
+}
