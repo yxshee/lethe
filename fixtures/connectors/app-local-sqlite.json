@@ -1,0 +1,17 @@
+{
+  "connector_ref": "connector://app-local-sqlite",
+  "store_ref": "store://app-local-sqlite",
+  "capability_version": "1",
+  "kinds": ["cache", "summary", "memory"],
+  "supports_inventory": true,
+  "supports_mutation": true,
+  "supports_read_back": true,
+  "physical_id_scheme": "scope-qualified (tenant, workspace, environment, version_id) SQL rows",
+  "filters": ["scope", "version_id", "principal_ref", "policy_version"],
+  "actions": {
+    "cache": "evict (full or principal/policy-keyed)",
+    "summary": "delete for rebuild from surviving parents; never edited in place",
+    "memory": "delete for rebuild from surviving parents; never edited in place"
+  },
+  "deployment": "embedded, agent state database"
+}
