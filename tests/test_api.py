@@ -290,3 +290,21 @@ def test_control_plane_endpoints_cover_scan_graph_run_receipt_and_verification(
     for document in dashboard_documents:
         assert forbidden_keys.isdisjoint(_all_keys(document))
         assert CANARY_VALUE not in json.dumps(document, sort_keys=True)
+
+
+def test_assessments_endpoint_requires_control_token(
+    client: TestClient, service: LetheService
+) -> None:
+    body = {**service.scope.model_dump(), "root_version_ids": [SOURCE_VERSION]}
+
+    unauthorized = client.post("/api/v1/assessments", json=body)
+    assert unauthorized.status_code == 403
+
+    response = client.post("/api/v1/assessments", headers=_bearer(CONTROL_TOKEN), json=body)
+    assert response.status_code == 200
+    report = response.json()
+    assert report["read_only"] is True
+    assert report["coverage_level"] in {"L1", "L2"}
+    assert sum(report["denominators"].values()) > 0
+    assert report["scan_id"]
+    assert {entry["connector_ref"] for entry in report["connector_freshness"]}

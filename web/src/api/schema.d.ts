@@ -140,6 +140,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/assessments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Assess */
+        post: operations["assess_api_v1_assessments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/receipts/{run_id}": {
         parameters: {
             query?: never;
@@ -188,6 +205,47 @@ export interface components {
          * @enum {string}
          */
         ActionState: "pending" | "leased" | "retryable" | "succeeded" | "failed" | "dead_letter";
+        /** AssessmentFinding */
+        AssessmentFinding: {
+            /** Finding Id */
+            finding_id: string;
+            severity: components["schemas"]["AssessmentSeverity"];
+            finding_class: components["schemas"]["FindingClass"];
+            derivative_kind: components["schemas"]["ObjectKind"];
+            /** Connector Ref */
+            connector_ref: string;
+            /** Target Version Id */
+            target_version_id?: string | null;
+            evidence_level: components["schemas"]["EvidenceLevel"];
+            gap_code?: components["schemas"]["AssessmentGapCode"] | null;
+            /** Confidence */
+            confidence?: number | null;
+            reason_code?: components["schemas"]["ReceiptReasonCode"] | null;
+        };
+        /**
+         * AssessmentGapCode
+         * @enum {string}
+         */
+        AssessmentGapCode: "missing_parent_edge" | "missing_policy_metadata" | "missing_lineage_metadata" | "unsupported_connector" | "unverified_semantic_candidate";
+        /** AssessmentIncident */
+        AssessmentIncident: {
+            /** Incident Id */
+            incident_id: string;
+            severity: components["schemas"]["AssessmentSeverity"];
+            /** Finding Ids */
+            finding_ids: string[];
+            reason_code: components["schemas"]["ReceiptReasonCode"];
+            /**
+             * Detected At
+             * Format: date-time
+             */
+            detected_at: string;
+        };
+        /**
+         * AssessmentSeverity
+         * @enum {string}
+         */
+        AssessmentSeverity: "critical" | "high" | "medium" | "informational";
         /** ConnectorCapabilityVersion */
         ConnectorCapabilityVersion: {
             /** Connector Ref */
@@ -200,6 +258,21 @@ export interface components {
             supports_mutation: boolean;
             /** Supports Read Back */
             supports_read_back: boolean;
+        };
+        /** ConnectorFreshness */
+        ConnectorFreshness: {
+            /** Connector Ref */
+            connector_ref: string;
+            /** Store Ref */
+            store_ref?: string | null;
+            /** Capability Version */
+            capability_version: string;
+            /** Freshness Cursor */
+            freshness_cursor: string;
+            /** Reachable */
+            reachable: boolean;
+            /** Kinds */
+            kinds?: components["schemas"]["ObjectKind"][];
         };
         /** CorrectionPayload */
         CorrectionPayload: {
@@ -437,6 +510,64 @@ export interface components {
             /** New Policy Version */
             new_policy_version: number;
         };
+        /** PostureAssessmentReport */
+        PostureAssessmentReport: {
+            /** Tenant Id */
+            tenant_id: string;
+            /** Workspace Id */
+            workspace_id: string;
+            /** Environment Id */
+            environment_id: string;
+            /**
+             * Schema Version
+             * @default 1
+             * @constant
+             */
+            schema_version: "1";
+            /** Assessment Id */
+            assessment_id: string;
+            /** Scan Id */
+            scan_id: string;
+            /**
+             * Read Only
+             * @default true
+             * @constant
+             */
+            read_only: true;
+            coverage_level: components["schemas"]["EvidenceLevel"];
+            /** Scope Manifest Hash */
+            scope_manifest_hash: string;
+            /** Denominators */
+            denominators: {
+                [key: string]: number;
+            };
+            /** Connector Freshness */
+            connector_freshness: components["schemas"]["ConnectorFreshness"][];
+            /** Findings */
+            findings: components["schemas"]["AssessmentFinding"][];
+            /** Lineage Gaps */
+            lineage_gaps: components["schemas"]["AssessmentFinding"][];
+            /** Unsupported Scope */
+            unsupported_scope?: components["schemas"]["UnsupportedSink"][];
+            /** Incidents */
+            incidents: components["schemas"]["AssessmentIncident"][];
+            /** Severity Counts */
+            severity_counts: {
+                [key: string]: number;
+            };
+            fixture_metrics?: components["schemas"]["ScannerFixtureMetrics"] | null;
+            outcome: components["schemas"]["RunOutcome"];
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /**
+             * Completed At
+             * Format: date-time
+             */
+            completed_at: string;
+        };
         /** QueryRequest */
         QueryRequest: {
             /** Query */
@@ -666,6 +797,21 @@ export interface components {
              * Format: date-time
              */
             completed_at: string;
+        };
+        /** ScannerFixtureMetrics */
+        ScannerFixtureMetrics: {
+            /** Corpus Ref */
+            corpus_ref: string;
+            /** Precision */
+            precision: number;
+            /** Recall */
+            recall: number;
+            /**
+             * Fixture Only
+             * @default true
+             * @constant
+             */
+            fixture_only: true;
         };
         /** UnsupportedSink */
         UnsupportedSink: {
@@ -943,6 +1089,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ScanResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assess_api_v1_assessments_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScanRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PostureAssessmentReport"];
                 };
             };
             /** @description Validation Error */

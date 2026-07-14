@@ -217,6 +217,20 @@ def run_scan_stage(settings: Settings, root_version_id: str) -> int:
     return 0
 
 
+def run_assessment_stage(settings: Settings, root_version_id: str, output: Path | None) -> int:
+    service = _deterministic_service(settings)
+    service.initialize()
+    report = service.assess(
+        ScanRequest(**service.scope.model_dump(), root_version_ids=[root_version_id])
+    )
+    rendered = report.model_dump_json(indent=2)
+    if output is not None:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(rendered + "\n", encoding="utf-8")
+    print(rendered)
+    return 0 if report.outcome.value != "failed" else 1
+
+
 def run_propagation_stage(settings: Settings, run_id: str | None) -> int:
     service = _deterministic_service(settings)
     service.initialize(seed_if_empty=False)
@@ -435,6 +449,9 @@ def parser() -> argparse.ArgumentParser:
     event_only.add_argument("event_type", choices=[item.value for item in EventType])
     scan = subcommands.add_parser("scan")
     scan.add_argument("--root-version-id", default="ver_demo_canary_001")
+    assess = subcommands.add_parser("assess")
+    assess.add_argument("--root-version-id", default="ver_demo_canary_001")
+    assess.add_argument("--output", type=Path)
     propagate = subcommands.add_parser("propagate")
     propagate.add_argument("--run-id")
     probe = subcommands.add_parser("probe")
@@ -475,6 +492,8 @@ def main(argv: list[str] | None = None) -> int:
         return accept_event_only(settings, args.event_type)
     if args.command == "scan":
         return run_scan_stage(settings, args.root_version_id)
+    if args.command == "assess":
+        return run_assessment_stage(settings, args.root_version_id, args.output)
     if args.command == "propagate":
         return run_propagation_stage(settings, args.run_id)
     if args.command == "probe":

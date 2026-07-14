@@ -392,6 +392,62 @@
         }
       }
     },
+    "/api/v1/assessments": {
+      "post": {
+        "summary": "Assess",
+        "operationId": "assess_api_v1_assessments_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScanRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostureAssessmentReport"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/receipts/{run_id}": {
       "get": {
         "summary": "Get Receipt",
@@ -532,6 +588,152 @@
         ],
         "title": "ActionState"
       },
+      "AssessmentFinding": {
+        "properties": {
+          "finding_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Finding Id"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/AssessmentSeverity"
+          },
+          "finding_class": {
+            "$ref": "#/components/schemas/FindingClass"
+          },
+          "derivative_kind": {
+            "$ref": "#/components/schemas/ObjectKind"
+          },
+          "connector_ref": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Connector Ref"
+          },
+          "target_version_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 512,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Version Id"
+          },
+          "evidence_level": {
+            "$ref": "#/components/schemas/EvidenceLevel"
+          },
+          "gap_code": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AssessmentGapCode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "reason_code": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReceiptReasonCode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "finding_id",
+          "severity",
+          "finding_class",
+          "derivative_kind",
+          "connector_ref",
+          "evidence_level"
+        ],
+        "title": "AssessmentFinding"
+      },
+      "AssessmentGapCode": {
+        "type": "string",
+        "enum": [
+          "missing_parent_edge",
+          "missing_policy_metadata",
+          "missing_lineage_metadata",
+          "unsupported_connector",
+          "unverified_semantic_candidate"
+        ],
+        "title": "AssessmentGapCode"
+      },
+      "AssessmentIncident": {
+        "properties": {
+          "incident_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Incident Id"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/AssessmentSeverity"
+          },
+          "finding_ids": {
+            "items": {
+              "type": "string",
+              "maxLength": 512,
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Finding Ids"
+          },
+          "reason_code": {
+            "$ref": "#/components/schemas/ReceiptReasonCode"
+          },
+          "detected_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Detected At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "incident_id",
+          "severity",
+          "finding_ids",
+          "reason_code",
+          "detected_at"
+        ],
+        "title": "AssessmentIncident"
+      },
+      "AssessmentSeverity": {
+        "type": "string",
+        "enum": [
+          "critical",
+          "high",
+          "medium",
+          "informational"
+        ],
+        "title": "AssessmentSeverity"
+      },
       "ConnectorCapabilityVersion": {
         "properties": {
           "connector_ref": {
@@ -569,6 +771,61 @@
           "supports_read_back"
         ],
         "title": "ConnectorCapabilityVersion"
+      },
+      "ConnectorFreshness": {
+        "properties": {
+          "connector_ref": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Connector Ref"
+          },
+          "store_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2048,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Store Ref"
+          },
+          "capability_version": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Capability Version"
+          },
+          "freshness_cursor": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Freshness Cursor"
+          },
+          "reachable": {
+            "type": "boolean",
+            "title": "Reachable"
+          },
+          "kinds": {
+            "items": {
+              "$ref": "#/components/schemas/ObjectKind"
+            },
+            "type": "array",
+            "title": "Kinds"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "connector_ref",
+          "capability_version",
+          "freshness_cursor",
+          "reachable"
+        ],
+        "title": "ConnectorFreshness"
       },
       "CorrectionPayload": {
         "properties": {
@@ -1239,6 +1496,162 @@
           "new_policy_version"
         ],
         "title": "PermissionChangePayload"
+      },
+      "PostureAssessmentReport": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Tenant Id"
+          },
+          "workspace_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Workspace Id"
+          },
+          "environment_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Environment Id"
+          },
+          "schema_version": {
+            "type": "string",
+            "const": "1",
+            "title": "Schema Version",
+            "default": "1"
+          },
+          "assessment_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Assessment Id"
+          },
+          "scan_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Scan Id"
+          },
+          "read_only": {
+            "type": "boolean",
+            "const": true,
+            "title": "Read Only",
+            "default": true
+          },
+          "coverage_level": {
+            "$ref": "#/components/schemas/EvidenceLevel"
+          },
+          "scope_manifest_hash": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 8,
+            "title": "Scope Manifest Hash"
+          },
+          "denominators": {
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0.0
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/ObjectKind"
+            },
+            "type": "object",
+            "title": "Denominators"
+          },
+          "connector_freshness": {
+            "items": {
+              "$ref": "#/components/schemas/ConnectorFreshness"
+            },
+            "type": "array",
+            "title": "Connector Freshness"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/AssessmentFinding"
+            },
+            "type": "array",
+            "title": "Findings"
+          },
+          "lineage_gaps": {
+            "items": {
+              "$ref": "#/components/schemas/AssessmentFinding"
+            },
+            "type": "array",
+            "title": "Lineage Gaps"
+          },
+          "unsupported_scope": {
+            "items": {
+              "$ref": "#/components/schemas/UnsupportedSink"
+            },
+            "type": "array",
+            "title": "Unsupported Scope"
+          },
+          "incidents": {
+            "items": {
+              "$ref": "#/components/schemas/AssessmentIncident"
+            },
+            "type": "array",
+            "title": "Incidents"
+          },
+          "severity_counts": {
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0.0
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/AssessmentSeverity"
+            },
+            "type": "object",
+            "title": "Severity Counts"
+          },
+          "fixture_metrics": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScannerFixtureMetrics"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/RunOutcome"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Completed At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "workspace_id",
+          "environment_id",
+          "assessment_id",
+          "scan_id",
+          "coverage_level",
+          "scope_manifest_hash",
+          "denominators",
+          "connector_freshness",
+          "findings",
+          "lineage_gaps",
+          "incidents",
+          "severity_counts",
+          "outcome",
+          "started_at",
+          "completed_at"
+        ],
+        "title": "PostureAssessmentReport"
       },
       "QueryRequest": {
         "properties": {
@@ -2043,6 +2456,42 @@
           "completed_at"
         ],
         "title": "ScanResponse"
+      },
+      "ScannerFixtureMetrics": {
+        "properties": {
+          "corpus_ref": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Corpus Ref"
+          },
+          "precision": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Precision"
+          },
+          "recall": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Recall"
+          },
+          "fixture_only": {
+            "type": "boolean",
+            "const": true,
+            "title": "Fixture Only",
+            "default": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "corpus_ref",
+          "precision",
+          "recall"
+        ],
+        "title": "ScannerFixtureMetrics"
       },
       "UnsupportedSink": {
         "properties": {

@@ -16,6 +16,7 @@ from lethe_control.models import (
     GraphResponse,
     HealthResponse,
     LifecycleEvent,
+    PostureAssessmentReport,
     QueryRequest,
     QueryResponse,
     ReceiptVerifyRequest,
@@ -124,6 +125,13 @@ def create_app(
     def scan(body: ScanRequest, authorization: str | None = Header(default=None)) -> ScanResponse:
         require_control_token(configured, authorization)
         return lifecycle_service.scan(body)
+
+    @app.post("/api/v1/assessments", response_model=PostureAssessmentReport)
+    def assess(
+        body: ScanRequest, authorization: str | None = Header(default=None)
+    ) -> PostureAssessmentReport:
+        require_control_token(configured, authorization)
+        return lifecycle_service.assess(body)
 
     @app.get("/api/v1/receipts/{run_id}", response_model=ExecutionReceipt)
     def get_receipt(
