@@ -1,0 +1,179 @@
+{
+  "schema_version": "1",
+  "fixture_id": "lethe-v0.1-closed-world-2026-07-14",
+  "frozen": true,
+  "scope": {
+    "tenant_id": "ten_demo",
+    "workspace_id": "ws_demo",
+    "environment_id": "env_local",
+    "agent_id": "agent_demo_01",
+    "inert_isolation_scope": {
+      "tenant_id": "ten_demo_other",
+      "workspace_id": "ws_demo_other",
+      "environment_id": "env_local"
+    }
+  },
+  "clock": {
+    "initial_time": "2026-07-14T10:00:00Z",
+    "policy_parent_valid_until": "2026-07-15T12:00:00Z",
+    "canary_source_valid_until": "2026-07-20T12:00:00Z"
+  },
+  "corpus": [
+    {
+      "fixture_ref": "source_canary_v1",
+      "path": "documents/canary_source.md",
+      "object_id": "obj_demo_canary",
+      "version_id": "ver_demo_canary_001",
+      "kind": "source",
+      "acl_ref": "acl://demo/nightjar/1",
+      "allowed_principals": ["alice", "bob"],
+      "valid_until": "2026-07-20T12:00:00Z",
+      "registered": true
+    },
+    {
+      "fixture_ref": "source_canary_v2_corrected",
+      "path": "documents/corrected_source.md",
+      "object_id": "obj_demo_canary",
+      "version_id": "ver_demo_corrected_001",
+      "kind": "source",
+      "acl_ref": "acl://demo/nightjar/2",
+      "allowed_principals": ["alice", "bob"],
+      "valid_until": "2026-07-20T12:00:00Z",
+      "registered": false,
+      "supersedes_version_id": "ver_demo_canary_001",
+      "expected_fingerprint": "hmac-sha256:demo-v1:FKN0GMVO4xj3yg1cULqOXKQVktAeP6rqvfIEY5tdYkQ"
+    },
+    {
+      "fixture_ref": "source_policy_parent",
+      "path": "documents/policy_parent.md",
+      "object_id": "obj_demo_policy_parent",
+      "version_id": "ver_demo_policy_parent_001",
+      "kind": "source",
+      "acl_ref": "acl://demo/nightjar-policy/1",
+      "allowed_principals": ["alice"],
+      "valid_until": "2026-07-15T12:00:00Z",
+      "registered": true
+    },
+    {
+      "fixture_ref": "summary_multi_parent",
+      "path": "documents/multi_parent_summary.md",
+      "object_id": "obj_demo_multi_parent_summary",
+      "version_id": "ver_demo_multi_parent_summary_001",
+      "kind": "summary",
+      "parent_version_ids": ["ver_demo_canary_001", "ver_demo_policy_parent_001"],
+      "root_version_ids": ["ver_demo_canary_001", "ver_demo_policy_parent_001"],
+      "effective_allowed_principals": ["alice"],
+      "effective_valid_until": "2026-07-15T12:00:00Z",
+      "registered": true
+    }
+  ],
+  "chunking": {
+    "implementation": "fixed-codepoint-window",
+    "version": "1",
+    "unit": "unicode_codepoints_after_lf_canonicalization",
+    "size": 240,
+    "overlap": 40,
+    "canary_source_chunk_count": 4
+  },
+  "embedding": {
+    "implementation": "signed-feature-hash",
+    "version": "signed-feature-hash-v1",
+    "features": ["casefolded_word_unigrams", "adjacent_word_bigrams"],
+    "dimensions": 64,
+    "normalization": "l2",
+    "hosted_model_required": false
+  },
+  "fingerprint": {
+    "algorithm": "HMAC-SHA-256",
+    "domain": "LETHE-FINGERPRINT-V1",
+    "key_version": "demo-v1",
+    "purpose": "content-fingerprint",
+    "demo_master_key_byte": "0x44",
+    "demo_master_key_length": 32
+  },
+  "scanner": {
+    "semantic_threshold": 0.8,
+    "semantic_findings_are_report_only": true,
+    "seeded_exact_untracked_positive_count": 2,
+    "seeded_semantic_positive_count": 2,
+    "seeded_negative_count": 4
+  },
+  "probes": {
+    "prohibited": {
+      "path": "probes/prohibited.json",
+      "count": 100,
+      "expected_disclosures": 0
+    },
+    "unrelated": {
+      "path": "probes/unrelated.json",
+      "count": 100,
+      "maximum_false_blocks": 1
+    }
+  },
+  "random_seed": 170714,
+  "registered_stores": ["local_objects", "chroma", "cache", "summaries", "memories"],
+  "connector_capability_versions": {
+    "local_objects": "1",
+    "chroma": "1",
+    "cache": "1",
+    "summaries": "1",
+    "memories": "1"
+  },
+  "expected_denominators": {
+    "delete_demo": {
+      "sources": 1,
+      "chunks": 4,
+      "embeddings": 4,
+      "caches": 1,
+      "summaries": 2,
+      "memories": 3,
+      "expected_tracked_descendants": 14,
+      "expected_total_targets": 15
+    }
+  },
+  "reference_hardware": {
+    "description": "Apple M5, 10 logical CPUs, 16 GB RAM, internal SSD, no network",
+    "machine_model": "Mac17,3",
+    "logical_cpu_count": 10,
+    "memory_bytes": 17179869184,
+    "performance_targets_are_hypotheses": true
+  },
+  "assets": [
+    {
+      "path": "documents/canary_source.md",
+      "sha256": "90377930768cc0cb59533eb456d08c169e6ab00494144a54fab9fce4e9945083"
+    },
+    {
+      "path": "documents/corrected_source.md",
+      "sha256": "17463b1c9c76f0b800423dd42fe674b14c4738c8edc6c34a0bd0a25660a40c61"
+    },
+    {
+      "path": "documents/multi_parent_summary.md",
+      "sha256": "28d55c9df96e15787c72595093fcba26d82bbc34799527ba7b7a04ee6a4097b7"
+    },
+    {
+      "path": "documents/policy_parent.md",
+      "sha256": "b1fdb880ef357f775f97797c2f984a01525917d2c9bfbbace19b0165a0dd242f"
+    },
+    {
+      "path": "probes/prohibited.json",
+      "sha256": "e0f770606b084ac08075804907e2737e4ebee9dbc44372bb1b1d6c8da90adaf6"
+    },
+    {
+      "path": "probes/unrelated.json",
+      "sha256": "4f4b1def97569d6ed9b8db5ec098639453102f1096fd5a6e2961c27117529797"
+    },
+    {
+      "path": "keys/demo_keys.json",
+      "sha256": "06430de810aaa075047b364f2a9bf5e79dd24d0e94658a1bf8685238a7124353"
+    },
+    {
+      "path": "keys/enrollments.json",
+      "sha256": "0a3fce772a7c1ed390f6fa96531f77990c02e509466b9bab0434fee78a5466ab"
+    },
+    {
+      "path": "demo-events.json",
+      "sha256": "3b6696fc65562309a80c84c1b1e22beb5ef2de48cdd4ac6f745c1973e8ecb57c"
+    }
+  ]
+}

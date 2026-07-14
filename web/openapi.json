@@ -1,0 +1,2154 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Lethe v0.1 \u2014 internal codename",
+    "description": "Closed-world localhost proof. Receipts are scoped signer assertions, not universal deletion proof.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/healthz": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_healthz_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/readyz": {
+      "get": {
+        "summary": "Ready",
+        "operationId": "ready_readyz_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/events": {
+      "post": {
+        "summary": "Accept Event",
+        "operationId": "accept_event_api_v1_events_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "name": "X-Lethe-Event-Signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Lethe-Event-Signature"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LifecycleEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventAccepted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/runs/{run_id}": {
+      "get": {
+        "summary": "Get Run",
+        "operationId": "get_run_api_v1_runs__run_id__get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunStatusResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/graph/{version_id}": {
+      "get": {
+        "summary": "Get Graph",
+        "operationId": "get_graph_api_v1_graph__version_id__get",
+        "parameters": [
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Version Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraphResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/query": {
+      "post": {
+        "summary": "Query",
+        "operationId": "query_api_v1_query_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/demo/unsafe-query": {
+      "post": {
+        "summary": "Unsafe Query",
+        "operationId": "unsafe_query_api_v1_demo_unsafe_query_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/scans": {
+      "post": {
+        "summary": "Scan",
+        "operationId": "scan_api_v1_scans_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScanRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScanResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/receipts/{run_id}": {
+      "get": {
+        "summary": "Get Receipt",
+        "operationId": "get_receipt_api_v1_receipts__run_id__get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionReceipt"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/receipts/verify": {
+      "post": {
+        "summary": "Verify Receipts",
+        "operationId": "verify_receipts_api_v1_receipts_verify_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReceiptVerifyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiptVerifyResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActionCode": {
+        "type": "string",
+        "enum": [
+          "deny",
+          "delete",
+          "quarantine",
+          "tombstone",
+          "evict",
+          "suppress",
+          "rebuild",
+          "update_acl"
+        ],
+        "title": "ActionCode"
+      },
+      "ActionState": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "leased",
+          "retryable",
+          "succeeded",
+          "failed",
+          "dead_letter"
+        ],
+        "title": "ActionState"
+      },
+      "ConnectorCapabilityVersion": {
+        "properties": {
+          "connector_ref": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Connector Ref"
+          },
+          "capability_version": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Capability Version"
+          },
+          "supports_inventory": {
+            "type": "boolean",
+            "title": "Supports Inventory"
+          },
+          "supports_mutation": {
+            "type": "boolean",
+            "title": "Supports Mutation"
+          },
+          "supports_read_back": {
+            "type": "boolean",
+            "title": "Supports Read Back"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "connector_ref",
+          "capability_version",
+          "supports_inventory",
+          "supports_mutation",
+          "supports_read_back"
+        ],
+        "title": "ConnectorCapabilityVersion"
+      },
+      "CorrectionPayload": {
+        "properties": {
+          "replacement_version_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Replacement Version Id"
+          },
+          "replacement_content_ref": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Replacement Content Ref"
+          },
+          "replacement_fingerprint": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 8,
+            "title": "Replacement Fingerprint"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "replacement_version_id",
+          "replacement_content_ref",
+          "replacement_fingerprint"
+        ],
+        "title": "CorrectionPayload"
+      },
+      "EventAccepted": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Tenant Id"
+          },
+          "workspace_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Workspace Id"
+          },
+          "environment_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Environment Id"
+          },
+          "event_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Event Id"
+          },
+          "run_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Run Id"
+          },
+          "duplicate": {
+            "type": "boolean",
+            "title": "Duplicate",
+            "default": false
+          },
+          "gate_state": {
+            "$ref": "#/components/schemas/LifecycleState"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "workspace_id",
+          "environment_id",
+          "event_id",
+          "run_id",
+          "gate_state"
+        ],
+        "title": "EventAccepted"
+      },
+      "EventType": {
+        "type": "string",
+        "enum": [
+          "delete",
+          "correct",
+          "expire",
+          "permission_change"
+        ],
+        "title": "EventType"
+      },
+      "EvidenceLevel": {
+        "type": "string",
+        "enum": [
+          "L0",
+          "L1",
+          "L2",
+          "L3",
+          "L4"
+        ],
+        "title": "EvidenceLevel"
+      },
+      "ExecutionReceipt": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Tenant Id"
+          },
+          "workspace_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Workspace Id"
+          },
+          "environment_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Environment Id"
+          },
+          "receipt_version": {
+            "type": "string",
+            "const": "1",
+            "title": "Receipt Version",
+            "default": "1"
+          },
+          "agent_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Agent Id"
+          },
+          "key_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Key Id"
+          },
+          "chain_sequence": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Chain Sequence"
+          },
+          "previous_receipt_hash": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 8
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Receipt Hash"
+          },
+          "event_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Event Id"
+          },
+          "run_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Run Id"
+          },
+          "source_version_ids": {
+            "items": {
+              "type": "string",
+              "maxLength": 512,
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Source Version Ids"
+          },
+          "policy_version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Policy Version"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ReceiptScope"
+          },
+          "coverage_level": {
+            "$ref": "#/components/schemas/EvidenceLevel"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/ReceiptCounts"
+          },
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/ReceiptAction"
+            },
+            "type": "array",
+            "title": "Actions"
+          },
+          "verification_results": {
+            "items": {
+              "$ref": "#/components/schemas/ReceiptVerificationResult"
+            },
+            "type": "array",
+            "title": "Verification Results"
+          },
+          "exclusions": {
+            "items": {
+              "$ref": "#/components/schemas/ReceiptExclusion"
+            },
+            "type": "array",
+            "title": "Exclusions"
+          },
+          "unsupported_sinks": {
+            "items": {
+              "$ref": "#/components/schemas/UnsupportedSink"
+            },
+            "type": "array",
+            "title": "Unsupported Sinks"
+          },
+          "residual_risks": {
+            "items": {
+              "$ref": "#/components/schemas/ResidualRisk"
+            },
+            "type": "array",
+            "title": "Residual Risks"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/RunOutcome"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Completed At"
+          },
+          "evidence_manifest_hash": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 8,
+            "title": "Evidence Manifest Hash"
+          },
+          "signature_algorithm": {
+            "type": "string",
+            "const": "Ed25519",
+            "title": "Signature Algorithm",
+            "default": "Ed25519"
+          },
+          "signature": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 8,
+            "title": "Signature"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "workspace_id",
+          "environment_id",
+          "agent_id",
+          "key_id",
+          "chain_sequence",
+          "previous_receipt_hash",
+          "event_id",
+          "run_id",
+          "source_version_ids",
+          "policy_version",
+          "scope",
+          "coverage_level",
+          "counts",
+          "actions",
+          "verification_results",
+          "exclusions",
+          "unsupported_sinks",
+          "residual_risks",
+          "outcome",
+          "started_at",
+          "completed_at",
+          "evidence_manifest_hash",
+          "signature"
+        ],
+        "title": "ExecutionReceipt"
+      },
+      "FindingClass": {
+        "type": "string",
+        "enum": [
+          "tracked",
+          "exact_untracked",
+          "semantic_candidate"
+        ],
+        "title": "FindingClass"
+      },
+      "GraphEdge": {
+        "properties": {
+          "parent_version_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Parent Version Id"
+          },
+          "child_version_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Child Version Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "parent_version_id",
+          "child_version_id"
+        ],
+        "title": "GraphEdge"
+      },
+      "GraphNode": {
+        "properties": {
+          "version_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Version Id"
+          },
+          "object_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Object Id"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ObjectKind"
+          },
+          "lifecycle_state": {
+            "$ref": "#/components/schemas/LifecycleState"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version_id",
+          "object_id",
+          "kind",
+          "lifecycle_state"
+        ],
+        "title": "GraphNode"
+      },
+      "GraphResponse": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Tenant Id"
+          },
+          "workspace_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Workspace Id"
+          },
+          "environment_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Environment Id"
+          },
+          "requested_version_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Requested Version Id"
+          },
+          "root_version_ids": {
+            "items": {
+              "type": "string",
+              "maxLength": 512,
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Root Version Ids"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/GraphNode"
+            },
+            "type": "array",
+            "title": "Nodes"
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/GraphEdge"
+            },
+            "type": "array",
+            "title": "Edges"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "workspace_id",
+          "environment_id",
+          "requested_version_id",
+          "root_version_ids",
+          "nodes",
+          "edges"
+        ],
+        "title": "GraphResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "degraded",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "checks": {
+            "additionalProperties": {
+              "type": "string",
+              "enum": [
+                "ok",
+                "degraded",
+                "failed"
+              ]
+            },
+            "type": "object",
+            "title": "Checks"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "HealthResponse"
+      },
+      "LifecycleEvent": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Tenant Id"
+          },
+          "workspace_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Workspace Id"
+          },
+          "environment_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Environment Id"
+          },
+          "schema_version": {
+            "type": "string",
+            "const": "1",
+            "title": "Schema Version",
+            "default": "1"
+          },
+          "event_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Event Id"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Idempotency Key"
+          },
+          "issuer_key_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Issuer Key Id"
+          },
+          "audience": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Audience"
+          },
+          "authority_ref": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Authority Ref"
+          },
+          "nonce": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Nonce"
+          },
+          "target_version_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Target Version Id"
+          },
+          "event_type": {
+            "$ref": "#/components/schemas/EventType"
+          },
+          "source_sequence": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Source Sequence"
+          },
+          "policy_version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Policy Version"
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Occurred At"
+          },
+          "effective_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Effective At"
+          },
+          "command_expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Command Expires At"
+          },
+          "actor_ref": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Actor Ref"
+          },
+          "reason_code": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Reason Code"
+          },
+          "correction": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CorrectionPayload"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "permission_change": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PermissionChangePayload"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "workspace_id",
+          "environment_id",
+          "event_id",
+          "idempotency_key",
+          "issuer_key_id",
+          "audience",
+          "authority_ref",
+          "nonce",
+          "target_version_id",
+          "event_type",
+          "source_sequence",
+          "policy_version",
+          "occurred_at",
+          "effective_at",
+          "command_expires_at",
+          "actor_ref",
+          "reason_code"
+        ],
+        "title": "LifecycleEvent"
+      },
+      "LifecycleState": {
+        "type": "string",
+        "enum": [
+          "active",
+          "denied",
+          "tombstoned"
+        ],
+        "title": "LifecycleState"
+      },
+      "ObjectKind": {
+        "type": "string",
+        "enum": [
+          "source",
+          "chunk",
+          "embedding",
+          "cache",
+          "summary",
+          "memory"
+        ],
+        "title": "ObjectKind"
+      },
+      "PermissionChangeKind": {
+        "type": "string",
+        "enum": [
+          "narrow",
+          "widen"
+        ],
+        "title": "PermissionChangeKind"
+      },
+      "PermissionChangePayload": {
+        "properties": {
+          "change": {
+            "$ref": "#/components/schemas/PermissionChangeKind"
+          },
+          "new_acl_ref": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "New Acl Ref"
+          },
+          "new_policy_version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "New Policy Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "change",
+          "new_acl_ref",
+          "new_policy_version"
+        ],
+        "title": "PermissionChangePayload"
+      },
+      "QueryRequest": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Query"
+          },
+          "purpose_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2048,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose Ref"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "query"
+        ],
+        "title": "QueryRequest"
+      },
+      "QueryResponse": {
+        "properties": {
+          "answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer"
+          },
+          "supporting_version_ids": {
+            "items": {
+              "type": "string",
+              "maxLength": 512,
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Supporting Version Ids"
+          },
+          "denied": {
+            "type": "boolean",
+            "title": "Denied"
+          },
+          "reason_codes": {
+            "items": {
+              "type": "string",
+              "maxLength": 512,
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Reason Codes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "answer",
+          "denied"
+        ],
+        "title": "QueryResponse"
+      },
+      "ReceiptAction": {
+        "properties": {
+          "action_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Action Id"
+          },
+          "target_version_ref": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Target Version Ref"
+          },
+          "derivative_kind": {
+            "$ref": "#/components/schemas/ObjectKind"
+          },
+          "connector_ref": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Connector Ref"
+          },
+          "action_code": {
+            "$ref": "#/components/schemas/ActionCode"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ActionState"
+          },
+          "attempt_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Attempt Count"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "reason_code": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReceiptReasonCode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "action_id",
+          "target_version_ref",
+          "derivative_kind",
+          "connector_ref",
+          "action_code",
+          "state",
+          "attempt_count"
+        ],
+        "title": "ReceiptAction"
+      },
+      "ReceiptCounts": {
+        "properties": {
+          "expected_tracked": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Expected Tracked"
+          },
+          "found_tracked": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Found Tracked"
+          },
+          "scanner_candidates": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Scanner Candidates"
+          },
+          "actions_attempted": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Actions Attempted"
+          },
+          "actions_succeeded": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Actions Succeeded"
+          },
+          "actions_failed": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Actions Failed"
+          },
+          "targets_verified": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Targets Verified"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expected_tracked",
+          "found_tracked",
+          "scanner_candidates",
+          "actions_attempted",
+          "actions_succeeded",
+          "actions_failed",
+          "targets_verified"
+        ],
+        "title": "ReceiptCounts"
+      },
+      "ReceiptExclusion": {
+        "properties": {
+          "target_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2048,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Ref"
+          },
+          "connector_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2048,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connector Ref"
+          },
+          "derivative_kind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ObjectKind"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reason_code": {
+            "$ref": "#/components/schemas/ReceiptReasonCode"
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Count",
+            "default": 0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reason_code"
+        ],
+        "title": "ReceiptExclusion"
+      },
+      "ReceiptReasonCode": {
+        "type": "string",
+        "enum": [
+          "declared_exclusion",
+          "connector_unreachable",
+          "connector_unsupported",
+          "store_mutation_failed",
+          "read_back_failed",
+          "policy_stale",
+          "legal_hold",
+          "outside_scope",
+          "scope_unknown",
+          "residual_payload",
+          "direct_store_bypass",
+          "unregistered_copy",
+          "host_trust"
+        ],
+        "title": "ReceiptReasonCode"
+      },
+      "ReceiptScope": {
+        "properties": {
+          "scope_manifest_hash": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 8,
+            "title": "Scope Manifest Hash"
+          },
+          "scope_selected_by": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Scope Selected By"
+          },
+          "requested_evidence_level": {
+            "$ref": "#/components/schemas/EvidenceLevel"
+          },
+          "scan_cutoff": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Scan Cutoff"
+          },
+          "registered_stores": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Registered Stores"
+          },
+          "registered_connectors": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Registered Connectors"
+          },
+          "reachable_connectors": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Reachable Connectors"
+          },
+          "connector_capability_versions": {
+            "items": {
+              "$ref": "#/components/schemas/ConnectorCapabilityVersion"
+            },
+            "type": "array",
+            "title": "Connector Capability Versions"
+          },
+          "unsupported_connectors": {
+            "items": {
+              "type": "string",
+              "maxLength": 2048,
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Unsupported Connectors"
+          },
+          "graph_snapshot_hash": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 8,
+            "title": "Graph Snapshot Hash"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "scope_manifest_hash",
+          "scope_selected_by",
+          "requested_evidence_level",
+          "scan_cutoff",
+          "registered_stores",
+          "registered_connectors",
+          "reachable_connectors",
+          "connector_capability_versions",
+          "unsupported_connectors",
+          "graph_snapshot_hash"
+        ],
+        "title": "ReceiptScope"
+      },
+      "ReceiptVerificationResult": {
+        "properties": {
+          "verification_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Verification Id"
+          },
+          "target_version_ref": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Target Version Ref"
+          },
+          "connector_ref": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Connector Ref"
+          },
+          "verification_code": {
+            "$ref": "#/components/schemas/VerificationCode"
+          },
+          "result": {
+            "$ref": "#/components/schemas/VerificationStatus"
+          },
+          "checked_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Checked At"
+          },
+          "reason_code": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReceiptReasonCode"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "verification_id",
+          "target_version_ref",
+          "connector_ref",
+          "verification_code",
+          "result",
+          "checked_at"
+        ],
+        "title": "ReceiptVerificationResult"
+      },
+      "ReceiptVerifyRequest": {
+        "properties": {
+          "receipts": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionReceipt"
+            },
+            "type": "array",
+            "title": "Receipts"
+          },
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Sequence"
+          },
+          "expected_head": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 8,
+            "title": "Expected Head"
+          },
+          "prior_trusted_head": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 8
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prior Trusted Head"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "receipts",
+          "expected_sequence",
+          "expected_head"
+        ],
+        "title": "ReceiptVerifyRequest"
+      },
+      "ReceiptVerifyResponse": {
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "title": "Valid"
+          },
+          "verified_sequence": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Verified Sequence"
+          },
+          "computed_head": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1024,
+                "minLength": 8
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Computed Head"
+          },
+          "reason_codes": {
+            "items": {
+              "type": "string",
+              "maxLength": 512,
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Reason Codes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "valid",
+          "verified_sequence"
+        ],
+        "title": "ReceiptVerifyResponse"
+      },
+      "ResidualRisk": {
+        "properties": {
+          "risk_code": {
+            "$ref": "#/components/schemas/ReceiptReasonCode"
+          },
+          "target_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2048,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Ref"
+          },
+          "connector_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2048,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connector Ref"
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Count",
+            "default": 0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "risk_code"
+        ],
+        "title": "ResidualRisk"
+      },
+      "RunOutcome": {
+        "type": "string",
+        "enum": [
+          "succeeded",
+          "partial",
+          "failed",
+          "unknown"
+        ],
+        "title": "RunOutcome"
+      },
+      "RunStatusResponse": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Tenant Id"
+          },
+          "workspace_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Workspace Id"
+          },
+          "environment_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Environment Id"
+          },
+          "run_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Run Id"
+          },
+          "event_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Event Id"
+          },
+          "phase": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Phase"
+          },
+          "counts": {
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0.0
+            },
+            "type": "object",
+            "title": "Counts"
+          },
+          "failures": {
+            "items": {
+              "$ref": "#/components/schemas/ReceiptAction"
+            },
+            "type": "array",
+            "title": "Failures"
+          },
+          "exclusions": {
+            "items": {
+              "$ref": "#/components/schemas/ReceiptExclusion"
+            },
+            "type": "array",
+            "title": "Exclusions"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RunOutcome"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "workspace_id",
+          "environment_id",
+          "run_id",
+          "event_id",
+          "phase",
+          "started_at"
+        ],
+        "title": "RunStatusResponse"
+      },
+      "ScanFinding": {
+        "properties": {
+          "finding_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Finding Id"
+          },
+          "finding_class": {
+            "$ref": "#/components/schemas/FindingClass"
+          },
+          "derivative_kind": {
+            "$ref": "#/components/schemas/ObjectKind"
+          },
+          "connector_ref": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Connector Ref"
+          },
+          "target_version_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 512,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Version Id"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "finding_id",
+          "finding_class",
+          "derivative_kind",
+          "connector_ref"
+        ],
+        "title": "ScanFinding"
+      },
+      "ScanRequest": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Tenant Id"
+          },
+          "workspace_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Workspace Id"
+          },
+          "environment_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Environment Id"
+          },
+          "root_version_ids": {
+            "items": {
+              "type": "string",
+              "maxLength": 512,
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Root Version Ids"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "workspace_id",
+          "environment_id"
+        ],
+        "title": "ScanRequest"
+      },
+      "ScanResponse": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Tenant Id"
+          },
+          "workspace_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Workspace Id"
+          },
+          "environment_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Environment Id"
+          },
+          "scan_id": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Scan Id"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/ScanFinding"
+            },
+            "type": "array",
+            "title": "Findings"
+          },
+          "denominator": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Denominator"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Completed At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "workspace_id",
+          "environment_id",
+          "scan_id",
+          "findings",
+          "denominator",
+          "completed_at"
+        ],
+        "title": "ScanResponse"
+      },
+      "UnsupportedSink": {
+        "properties": {
+          "connector_ref": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Connector Ref"
+          },
+          "derivative_kind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ObjectKind"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "capability_version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 512,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capability Version"
+          },
+          "reason_code": {
+            "$ref": "#/components/schemas/ReceiptReasonCode",
+            "default": "connector_unsupported"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "connector_ref"
+        ],
+        "title": "UnsupportedSink"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VerificationCode": {
+        "type": "string",
+        "enum": [
+          "payload_absent",
+          "tombstone_present",
+          "gate_denied",
+          "metadata_updated",
+          "branch_rebuilt",
+          "resurrection_blocked",
+          "store_read_back"
+        ],
+        "title": "VerificationCode"
+      },
+      "VerificationStatus": {
+        "type": "string",
+        "enum": [
+          "passed",
+          "failed",
+          "unknown"
+        ],
+        "title": "VerificationStatus"
+      }
+    }
+  }
+}

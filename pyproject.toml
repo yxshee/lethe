@@ -1,0 +1,54 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lethe-control"
+version = "0.1.0"
+description = "Closed-world derived-data lifecycle assurance demo"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "chromadb>=1.2,<2",
+  "cryptography>=45,<48",
+  "fastapi>=0.116,<1",
+  "pydantic>=2.11,<3",
+  "rfc8785>=0.1.4,<1",
+  "uvicorn>=0.35,<1",
+]
+
+[project.scripts]
+lethe-control = "lethe_control.cli:main"
+
+[dependency-groups]
+dev = [
+  "httpx>=0.28,<1",
+  "mypy>=1.17,<2",
+  "pytest>=8.4,<10",
+  "pytest-asyncio>=1.1,<2",
+  "pytest-cov>=6.2,<8",
+  "ruff>=0.12,<1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lethe_control"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/lethe_control/migrations" = "lethe_control/migrations"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+packages = ["lethe_control"]
+

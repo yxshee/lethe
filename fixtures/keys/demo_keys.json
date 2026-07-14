@@ -1,0 +1,24 @@
+{
+  "warning": "DEMO ONLY. DETERMINISTIC PRIVATE SEEDS. NEVER USE IN PRODUCTION.",
+  "schema_version": "1",
+  "keys": [
+    {
+      "role": "event_issuer",
+      "key_id": "issuer_demo_01",
+      "private_seed_base64url": "ERERERERERERERERERERERERERERERERERERERERERE",
+      "public_key_base64url": "0EqyMnQrtKs6E2i9RhXk5tAiSrcaAWuvhSCjMsl3hzc"
+    },
+    {
+      "role": "receipt_signer",
+      "key_id": "key_demo_01",
+      "private_seed_base64url": "IiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiI",
+      "public_key_base64url": "oJql9HpnWYAv-VX43C0qFKXJnSO-l_hkEn_5ODRVpPA"
+    },
+    {
+      "role": "mutation_approver",
+      "key_id": "approval_demo_01",
+      "private_seed_base64url": "MzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM",
+      "public_key_base64url": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4"
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "schema_version": "1",
+  "events": [
+    {
+      "label": "Delete original source",
+      "event": {
+        "schema_version": "1",
+        "tenant_id": "ten_demo",
+        "workspace_id": "ws_demo",
+        "environment_id": "env_local",
+        "issuer_key_id": "issuer_demo_01",
+        "audience": "agent_demo_01",
+        "authority_ref": "authority://demo/source-admin",
+        "target_version_id": "ver_demo_canary_001",
+        "occurred_at": "2026-07-14T10:00:00Z",
+        "effective_at": "2026-07-14T10:00:00Z",
+        "command_expires_at": "2099-01-01T00:00:00Z",
+        "actor_ref": "actor://demo/admin",
+        "event_id": "evt_delete_demo_001",
+        "idempotency_key": "demo-delete-001",
+        "nonce": "nonce-delete-demo-001",
+        "event_type": "delete",
+        "source_sequence": 1,
+        "policy_version": 2,
+        "reason_code": "source_deleted",
+        "correction": null,
+        "permission_change": null
+      },
+      "signature": "pbu-RpjrDkx679exYiQ6FyibJDqv6xgYlXfhwP7El9J2-72H1muMdAGPdLFR-jHMAtCeQaBBxrvkcDCFEKUCBw"
+    },
+    {
+      "label": "Correct original source",
+      "event": {
+        "schema_version": "1",
+        "tenant_id": "ten_demo",
+        "workspace_id": "ws_demo",
+        "environment_id": "env_local",
+        "issuer_key_id": "issuer_demo_01",
+        "audience": "agent_demo_01",
+        "authority_ref": "authority://demo/source-admin",
+        "target_version_id": "ver_demo_canary_001",
+        "occurred_at": "2026-07-14T10:00:00Z",
+        "effective_at": "2026-07-14T10:00:00Z",
+        "command_expires_at": "2099-01-01T00:00:00Z",
+        "actor_ref": "actor://demo/admin",
+        "event_id": "evt_correct_demo_001",
+        "idempotency_key": "demo-correct-001",
+        "nonce": "nonce-correct-demo-001",
+        "event_type": "correct",
+        "source_sequence": 2,
+        "policy_version": 3,
+        "reason_code": "source_corrected",
+        "correction": {
+          "replacement_version_id": "ver_demo_corrected_001",
+          "replacement_content_ref": "local-object://registered/ver_demo_corrected_001",
+          "replacement_fingerprint": "hmac-sha256:demo-v1:FKN0GMVO4xj3yg1cULqOXKQVktAeP6rqvfIEY5tdYkQ"
+        },
+        "permission_change": null
+      },
+      "signature": "k24V1Ybte07xjJaMpS8NlLckyL4KGXrT5cy4rBDuSW32kA7TbDTO3uav4Gt0QYwLk2rrhm9bypvfgucs6Za8DQ"
+    },
+    {
+      "label": "Expire original source",
+      "event": {
+        "schema_version": "1",
+        "tenant_id": "ten_demo",
+        "workspace_id": "ws_demo",
+        "environment_id": "env_local",
+        "issuer_key_id": "issuer_demo_01",
+        "audience": "agent_demo_01",
+        "authority_ref": "authority://demo/source-admin",
+        "target_version_id": "ver_demo_canary_001",
+        "occurred_at": "2026-07-14T10:00:00Z",
+        "effective_at": "2026-07-14T10:00:00Z",
+        "command_expires_at": "2099-01-01T00:00:00Z",
+        "actor_ref": "actor://demo/admin",
+        "event_id": "evt_expire_demo_001",
+        "idempotency_key": "demo-expire-001",
+        "nonce": "nonce-expire-demo-001",
+        "event_type": "expire",
+        "source_sequence": 3,
+        "policy_version": 3,
+        "reason_code": "retention_expired",
+        "correction": null,
+        "permission_change": null
+      },
+      "signature": "yx70X6yFxYgk8C1US79j-u3uXiV8mMqF8760H1dLhI8eSHfuTHUYsBmjkhwAufqktdGj010wCCLPl7XMHdzPBA"
+    },
+    {
+      "label": "Narrow original ACL",
+      "event": {
+        "schema_version": "1",
+        "tenant_id": "ten_demo",
+        "workspace_id": "ws_demo",
+        "environment_id": "env_local",
+        "issuer_key_id": "issuer_demo_01",
+        "audience": "agent_demo_01",
+        "authority_ref": "authority://demo/source-admin",
+        "target_version_id": "ver_demo_canary_001",
+        "occurred_at": "2026-07-14T10:00:00Z",
+        "effective_at": "2026-07-14T10:00:00Z",
+        "command_expires_at": "2099-01-01T00:00:00Z",
+        "actor_ref": "actor://demo/admin",
+        "event_id": "evt_permission_demo_001",
+        "idempotency_key": "demo-permission-001",
+        "nonce": "nonce-permission-demo-001",
+        "event_type": "permission_change",
+        "source_sequence": 4,
+        "policy_version": 4,
+        "reason_code": "access_removed",
+        "correction": null,
+        "permission_change": {
+          "change": "narrow",
+          "new_acl_ref": "acl://demo/nightjar/2",
+          "new_policy_version": 4
+        }
+      },
+      "signature": "rdFgI9hRDt6kz4mSwykn61X7xRSPWSYEKJmg7DrUgrXL_ZJVyGGOt-W_S0JH_gObJGTuS94hXOtWh9r6KL5CCQ"
+    }
+  ]
+}

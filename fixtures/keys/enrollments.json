@@ -1,0 +1,41 @@
+{
+  "schema_version": "1",
+  "enrollments": [
+    {
+      "key_id": "issuer_demo_01",
+      "public_key_base64url": "0EqyMnQrtKs6E2i9RhXk5tAiSrcaAWuvhSCjMsl3hzc",
+      "status": "active",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_until": "2100-01-01T00:00:00Z",
+      "tenant_id": "ten_demo",
+      "workspace_id": "ws_demo",
+      "environment_id": "env_local",
+      "agent_id": "agent_demo_01",
+      "allowed_roles": ["event_issuer"]
+    },
+    {
+      "key_id": "key_demo_01",
+      "public_key_base64url": "oJql9HpnWYAv-VX43C0qFKXJnSO-l_hkEn_5ODRVpPA",
+      "status": "active",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_until": "2100-01-01T00:00:00Z",
+      "tenant_id": "ten_demo",
+      "workspace_id": "ws_demo",
+      "environment_id": "env_local",
+      "agent_id": "agent_demo_01",
+      "allowed_roles": ["receipt_signer"]
+    },
+    {
+      "key_id": "approval_demo_01",
+      "public_key_base64url": "F8t5-ytBIPKx7GXkGY1uCLKOgT_rAeSkAIObheGAgM4",
+      "status": "active",
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_until": "2100-01-01T00:00:00Z",
+      "tenant_id": "ten_demo",
+      "workspace_id": "ws_demo",
+      "environment_id": "env_local",
+      "agent_id": "agent_demo_01",
+      "allowed_roles": ["mutation_approver"]
+    }
+  ]
+}
